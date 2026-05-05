@@ -15,45 +15,7 @@ If you find a vulnerability, see [How to report](#how-to-report-a-vulnerability)
 
 Untrusted text never reaches your AI assistant's planner unsanitized; tools never run with capabilities they didn't declare; tokens never enter the sandbox; irreversible actions never run without explicit user approval.
 
-```
-                                                  ┌─────────────────────────┐
-                                                  │  Anthropic Claude       │
-                                                  │  (your host AI)         │
-                                                  └────────────┬────────────┘
-                                                               │ MCP (stdio)
-                       trusted ────────────────────────────────┤
-                                                               ▼
-        ┌────────────────────────────────────────────────────────────────────┐
-        │  @patch-cat/mcp                                                    │
-        │  ┌──────────────┐   ┌──────────────────┐   ┌──────────────────┐   │
-        │  │  Sanitizer   │ → │  Quarantine LLM  │ → │  Taint tracker   │   │
-        │  │  (NFKC,      │   │  (Workers AI     │   │  (substring →    │   │
-        │  │  bidi, tag,  │   │  Llama 3.3 70B,  │   │  tainted_ok      │   │
-        │  │  zero-width) │   │  cross-vendor)   │   │  enforcement)    │   │
-        │  └──────────────┘   └──────────────────┘   └────────┬─────────┘   │
-        │                                                     │             │
-        │                          ┌──────────────────────────┴────────┐    │
-        │                          │  Confirmation gate                │    │
-        │                          │  (HITL + tainted-input            │    │
-        │                          │   approval tokens)                │    │
-        │                          └──────────────────┬────────────────┘    │
-        └────────────────────────────────────────────────┬───────────────────┘
-                                                         │ tainted ▼
-        ┌────────────────────────────────────────────────┴───────────────────┐
-        │  e2b sandbox  (allowInternetAccess derived from manifest)          │
-        │  ┌────────────────────────┐  ┌────────────────────────────────┐    │
-        │  │ generated Python tool  │  │ PATCH_ACCESS_TOKEN env var     │    │
-        │  │ (untrusted; can never  │  │ (Arcade-minted, scoped,        │    │
-        │  │ reach the planner)     │  │ short-lived)                   │    │
-        │  └────────────────────────┘  └────────────────────────────────┘    │
-        └────────────────────────────────────────────────────────────────────┘
-                                                              │
-                                                              ▼
-                                              ┌─────────────────────────────┐
-                                              │ Arcade.dev (refresh tokens) │
-                                              │ Patch never sees them.      │
-                                              └─────────────────────────────┘
-```
+<img src="/architecture-diagram.svg" alt="Patch architecture trust-boundary diagram showing the host AI calling Patch's local MCP server through stdio, with sanitizer, quarantine LLM, taint tracker, and confirmation gate before the e2b sandbox, and Arcade.dev holding refresh tokens outside the sandbox." style="width: 100%; max-width: 900px; margin: 24px 0;" />
 
 The host AI's planner sits outside this boundary. We don't control what it does with text once it has it; our job is to ensure what it gets is sanitized, summarized, and labeled.
 

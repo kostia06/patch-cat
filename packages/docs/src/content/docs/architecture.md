@@ -65,14 +65,7 @@ The sandbox runs `python /tmp/tool.py < /tmp/args.json`. Output is JSON on the l
 
 ## Trust boundaries
 
-```
-Host AI ──[MCP stdio]──> Patch local ──[HTTPS]──> Registry ──[R2]──> tool source
-                            │
-                            └──[e2b API]──> sandbox ──[network if allowed]──> external APIs
-                                              ▲
-                                              │ PATCH_ACCESS_TOKEN
-                            Patch local ──────┴──[Arcade]──> external service
-```
+<img src="/architecture-diagram.svg" alt="Patch architecture trust-boundary diagram" style="width: 100%; max-width: 900px; margin: 24px 0;" />
 
 Every solid line crossing into a new box is a trust boundary that Patch validates:
 

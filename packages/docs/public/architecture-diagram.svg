@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 760" role="img" aria-label="Patch architecture trust-boundary diagram showing the host AI calling Patch's local MCP server through stdio, with sanitizer, quarantine LLM, taint tracker, and confirmation gate before the e2b sandbox, and Arcade.dev holding refresh tokens outside the sandbox.">
+  <style>
+    .bg { fill: #fff; }
+    .stroke { stroke: #000; }
+    .text { fill: #000; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    .mono { font-family: "SF Mono", "JetBrains Mono", Menlo, monospace; }
+    .title { font-size: 14px; font-weight: 600; }
+    .small { font-size: 11px; opacity: 0.7; }
+    .label { font-size: 11px; opacity: 0.55; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; }
+    .container-label { font-size: 12px; font-weight: 600; opacity: 0.5; letter-spacing: 0.04em; }
+    .arrowhead { fill: #000; }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #000; }
+      .stroke { stroke: #fff; }
+      .text { fill: #fff; }
+      .arrowhead { fill: #fff; }
+    }
+  </style>
+
+  <rect class="bg" width="900" height="760"/>
+
+  <!-- Host AI -->
+  <rect class="bg stroke" x="340" y="20" width="220" height="64" rx="2" stroke-width="1.5"/>
+  <text class="text title" x="450" y="44" text-anchor="middle">Anthropic Claude</text>
+  <text class="text small" x="450" y="62" text-anchor="middle">your host AI</text>
+
+  <!-- Arrow 1: Host -> Patch -->
+  <line class="stroke" x1="450" y1="84" x2="450" y2="140" stroke-width="2"/>
+  <polygon class="arrowhead" points="446,138 454,138 450,148"/>
+  <text class="text small mono" x="460" y="105">MCP · stdio</text>
+  <text class="text label" x="440" y="120" text-anchor="end">trusted</text>
+
+  <!-- @patch-cat/mcp container -->
+  <rect class="bg stroke" x="40" y="148" width="820" height="320" rx="3" stroke-width="1.5"/>
+  <text class="text container-label mono" x="56" y="170">@patch-cat/mcp</text>
+
+  <!-- Sanitizer -->
+  <rect class="bg stroke" x="68" y="190" width="220" height="100" rx="2" stroke-width="1"/>
+  <text class="text title" x="178" y="218" text-anchor="middle">Sanitizer</text>
+  <text class="text small" x="178" y="240" text-anchor="middle">NFKC normalization</text>
+  <text class="text small" x="178" y="256" text-anchor="middle">tag chars, bidi overrides,</text>
+  <text class="text small" x="178" y="272" text-anchor="middle">zero-width characters</text>
+
+  <!-- Arrow: Sanitizer -> Quarantine -->
+  <line class="stroke" x1="288" y1="240" x2="334" y2="240" stroke-width="2"/>
+  <polygon class="arrowhead" points="332,236 332,244 342,240"/>
+
+  <!-- Quarantine LLM -->
+  <rect class="bg stroke" x="334" y="190" width="220" height="100" rx="2" stroke-width="1"/>
+  <text class="text title" x="444" y="218" text-anchor="middle">Quarantine LLM</text>
+  <text class="text small" x="444" y="240" text-anchor="middle">Workers AI</text>
+  <text class="text small" x="444" y="256" text-anchor="middle">Llama 3.3 70B</text>
+  <text class="text small mono" x="444" y="272" text-anchor="middle">cross-vendor</text>
+
+  <!-- Arrow: Quarantine -> Taint -->
+  <line class="stroke" x1="554" y1="240" x2="600" y2="240" stroke-width="2"/>
+  <polygon class="arrowhead" points="598,236 598,244 608,240"/>
+
+  <!-- Taint tracker -->
+  <rect class="bg stroke" x="600" y="190" width="220" height="100" rx="2" stroke-width="1"/>
+  <text class="text title" x="710" y="218" text-anchor="middle">Taint tracker</text>
+  <text class="text small" x="710" y="240" text-anchor="middle">substring matching against</text>
+  <text class="text small" x="710" y="256" text-anchor="middle">recent tool outputs</text>
+  <text class="text small mono" x="710" y="272" text-anchor="middle">tainted_ok enforcement</text>
+
+  <!-- Arrow: Taint -> Confirmation -->
+  <line class="stroke" x1="710" y1="290" x2="710" y2="346" stroke-width="2"/>
+  <polygon class="arrowhead" points="706,344 714,344 710,354"/>
+
+  <!-- Confirmation gate -->
+  <rect class="bg stroke" x="500" y="350" width="320" height="100" rx="2" stroke-width="1"/>
+  <text class="text title" x="660" y="378" text-anchor="middle">Confirmation gate</text>
+  <text class="text small" x="660" y="400" text-anchor="middle">human-in-the-loop +</text>
+  <text class="text small" x="660" y="416" text-anchor="middle">tainted-input approval tokens</text>
+  <text class="text small mono" x="660" y="436" text-anchor="middle">single-use, 60s TTL</text>
+
+  <!-- Arrow: Confirmation -> Sandbox (out of container) -->
+  <line class="stroke" x1="660" y1="450" x2="660" y2="510" stroke-width="2"/>
+  <polygon class="arrowhead" points="656,508 664,508 660,518"/>
+  <text class="text label" x="676" y="486">tainted</text>
+
+  <!-- e2b sandbox container -->
+  <rect class="bg stroke" x="40" y="514" width="820" height="146" rx="3" stroke-width="1.5"/>
+  <text class="text container-label mono" x="56" y="536">e2b sandbox</text>
+  <text class="text small" x="160" y="536">— allowInternetAccess derived from manifest</text>
+
+  <!-- Generated Python tool -->
+  <rect class="bg stroke" x="68" y="552" width="380" height="92" rx="2" stroke-width="1"/>
+  <text class="text title" x="258" y="580" text-anchor="middle">Generated Python tool</text>
+  <text class="text small" x="258" y="602" text-anchor="middle">untrusted code, single-shot run,</text>
+  <text class="text small" x="258" y="618" text-anchor="middle">stdout/stderr captured to audit blob</text>
+  <text class="text small" x="258" y="634" text-anchor="middle">— can never reach the planner —</text>
+
+  <!-- PATCH_ACCESS_TOKEN env var -->
+  <rect class="bg stroke" x="468" y="552" width="364" height="92" rx="2" stroke-width="1"/>
+  <text class="text title mono" x="650" y="580" text-anchor="middle">PATCH_ACCESS_TOKEN</text>
+  <text class="text small" x="650" y="602" text-anchor="middle">Arcade-minted, scoped to manifest's</text>
+  <text class="text small" x="650" y="618" text-anchor="middle">external_auth, short-lived</text>
+  <text class="text small" x="650" y="634" text-anchor="middle">— refresh token never injected —</text>
+
+  <!-- Arrow: Sandbox -> Arcade -->
+  <line class="stroke" x1="650" y1="660" x2="650" y2="708" stroke-width="2"/>
+  <polygon class="arrowhead" points="646,706 654,706 650,716"/>
+
+  <!-- Arcade.dev -->
+  <rect class="bg stroke" x="490" y="710" width="320" height="44" rx="2" stroke-width="1"/>
+  <text class="text title" x="650" y="728" text-anchor="middle">Arcade.dev</text>
+  <text class="text small" x="650" y="745" text-anchor="middle">refresh tokens · Patch never sees them</text>
+
+</svg>
