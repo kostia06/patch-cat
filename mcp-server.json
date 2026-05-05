@@ -1,0 +1,58 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schemas/server-descriptor.json",
+  "name": "@patch-cat/mcp",
+  "displayName": "Patch",
+  "description": "An MCP server that lets your AI assistant build and remember its own Python tools — and pulls from a public registry of tools shaped by every Patch user.",
+  "version": "0.4.0",
+  "author": {
+    "name": "Patch maintainers",
+    "url": "https://patch-cat.com",
+    "email": "hello@patch-cat.com"
+  },
+  "license": "MIT",
+  "homepage": "https://patch-cat.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/patch-cat/patch-cat"
+  },
+  "categories": ["developer-tools", "code-execution", "registry", "security"],
+  "tags": [
+    "mcp",
+    "anthropic",
+    "claude",
+    "agent-tools",
+    "code-execution",
+    "sandboxing",
+    "prompt-injection-defense",
+    "self-improving"
+  ],
+  "transports": ["stdio"],
+  "install": {
+    "type": "npx",
+    "command": "npx",
+    "args": ["-y", "@patch-cat/mcp"]
+  },
+  "configuration": {
+    "required": ["ANTHROPIC_API_KEY", "E2B_API_KEY"],
+    "optional": ["ARCADE_API_KEY", "PATCH_CAT_TOOLBOX_DIR", "LOG_LEVEL"]
+  },
+  "tools": [
+    { "name": "patch_generate_tool", "description": "Generate or pull a tool that fulfills a description." },
+    { "name": "patch_run_tool", "description": "Explicitly invoke a tool by name." },
+    { "name": "patch_list_tools", "description": "List every tool in the local toolbox." },
+    { "name": "patch_confirm_action", "description": "Approve a tool call previously blocked by tainted-input or human-confirm gating." },
+    { "name": "patch_list_runs", "description": "List recent tool execution runs from the local audit log." },
+    { "name": "patch_replay", "description": "Replay a recorded run; reports output_match yes/no/n_a-non-deterministic." },
+    { "name": "patch_auth_register", "description": "Authorize this Patch instance for registry contribution or external-service auth." },
+    { "name": "patch_auth_status", "description": "Show registry read/contribute status and external_auth state." }
+  ],
+  "security": {
+    "threatModelUrl": "https://patch-cat.com/threat-model",
+    "vulnerabilityReportEmail": "security@patch-cat.com"
+  },
+  "links": {
+    "quickstart": "https://patch-cat.com/quickstart",
+    "architecture": "https://patch-cat.com/architecture",
+    "manifest": "https://patch-cat.com/manifest"
+  }
+}

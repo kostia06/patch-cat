@@ -1,0 +1,32 @@
+{
+  "name": "patch-cat",
+  "version": "0.2.0-monorepo",
+  "private": true,
+  "description": "Patch monorepo: MCP server + hosted registry + shared types.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "pnpm -r --filter '@patch-cat/mcp' --filter '@patch-cat/shared' build",
+    "docs:dev": "pnpm --filter '@patch-cat/docs' dev",
+    "docs:build": "pnpm --filter '@patch-cat/docs' build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "pnpm -r --filter '!@patch-cat/docs' typecheck",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "verify:registry": "node --env-file=.env scripts/verify-registry.mjs",
+    "verify:e2e:registry": "node --env-file=.env scripts/e2e-two-machine.mjs",
+    "preseed": "node --env-file=.env scripts/preseed.mjs"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@modelcontextprotocol/sdk": "^1.18.0",
+    "env-paths": "^3.0.0",
+    "js-yaml": "^4.1.0",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.5"
+  }
+}

@@ -1,0 +1,17 @@
+src/
+tests/
+.github/
+.vscode/
+.idea/
+node_modules/
+coverage/
+*.test.ts
+*.tsbuildinfo
+tsconfig.json
+biome.json
+vitest.config.ts
+.env
+.env.local
+.gitignore
+CLAUDE.md
+NOTES.md

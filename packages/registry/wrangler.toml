@@ -1,0 +1,80 @@
+name = "patchcat-registry"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# ============================================================
+# Environment variables (non-secret).
+# Set secrets with `wrangler secret put <NAME>`.
+# Required secrets:
+#   DATABASE_URL              Neon connection string
+#   GITHUB_CLIENT_ID          GitHub OAuth app client id
+#   GITHUB_CLIENT_SECRET      GitHub OAuth app client secret
+#   SESSION_SECRET            Random 32+ byte string for JWT signing
+# ============================================================
+
+# ============================================================
+# Top-level config exists for the implicit (no --env) deployment.
+# Real deploys go through [env.dev] and [env.production] below.
+# ============================================================
+[vars]
+PUBLIC_R2_HOST = "https://pub-31bb598243174e89b24238b5b9da7f4b.r2.dev"
+OAUTH_REDIRECT_URI = ""
+
+[ai]
+binding = "AI"
+
+[[r2_buckets]]
+binding = "PATCH_TOOLS_BUCKET"
+bucket_name = "patchcat-tools-dev"
+
+# ============================================================
+# Cron triggers — Phase 4 self-refactoring candidate finder.
+# Nightly at 03:17 UTC (off-peak; specific minute reduces collision with
+# other Cloudflare cron tenants).
+# ============================================================
+[triggers]
+crons = ["17 3 * * *"]
+
+# ============================================================
+# Dev environment (workers.dev preview)
+# OAUTH_REDIRECT_URI is filled in after first deploy; the GitHub OAuth
+# app's callback URL must match this value.
+# ============================================================
+[env.dev]
+name = "patchcat-registry-dev"
+
+# Dev cron runs every 30 minutes — easier to test than waiting for nightly.
+[env.dev.triggers]
+crons = ["*/30 * * * *"]
+
+[env.dev.vars]
+PUBLIC_R2_HOST = "https://pub-31bb598243174e89b24238b5b9da7f4b.r2.dev"
+OAUTH_REDIRECT_URI = "https://patchcat-registry-dev.ilnkostia-dev.workers.dev/auth/github/callback"
+
+[env.dev.ai]
+binding = "AI"
+
+[[env.dev.r2_buckets]]
+binding = "PATCH_TOOLS_BUCKET"
+bucket_name = "patchcat-tools-dev"
+
+# ============================================================
+# Production environment (registry.patch-cat.com)
+# ============================================================
+[env.production]
+name = "patchcat-registry"
+routes = [
+  { pattern = "registry.patch-cat.com/*", zone_name = "patch-cat.com" }
+]
+
+[env.production.vars]
+PUBLIC_R2_HOST = "https://tools.patch-cat.com"
+OAUTH_REDIRECT_URI = "https://registry.patch-cat.com/auth/github/callback"
+
+[env.production.ai]
+binding = "AI"
+
+[[env.production.r2_buckets]]
+binding = "PATCH_TOOLS_BUCKET"
+bucket_name = "patchcat-tools"

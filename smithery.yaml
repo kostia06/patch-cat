@@ -1,0 +1,33 @@
+# Smithery server descriptor — https://smithery.ai
+# This file is the source of truth for the patch-cat listing on Smithery.
+
+startCommand:
+  type: stdio
+  command: npx
+  args:
+    - "-y"
+    - "@patch-cat/mcp"
+
+configSchema:
+  type: object
+  required:
+    - anthropicApiKey
+    - e2bApiKey
+  properties:
+    anthropicApiKey:
+      type: string
+      title: Anthropic API key
+      description: Used to generate new Python tools via claude-opus-4-7 when no registry match exists.
+    e2bApiKey:
+      type: string
+      title: e2b API key
+      description: Used to create cloud sandboxes for tool execution. Free tier covers most use.
+    arcadeApiKey:
+      type: string
+      title: Arcade.dev API key (optional)
+      description: Required only for tools that declare external_auth scopes (gmail.read, slack.send_message, etc.).
+
+env:
+  ANTHROPIC_API_KEY: "{anthropicApiKey}"
+  E2B_API_KEY: "{e2bApiKey}"
+  ARCADE_API_KEY: "{arcadeApiKey}"

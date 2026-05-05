@@ -1,0 +1,7 @@
+# Copy to .dev.vars (gitignored) for `wrangler dev`.
+# These map to Worker secrets in production — set them with `wrangler secret put`.
+
+DATABASE_URL=postgresql://user:pass@host.neon.tech/patchcat?sslmode=require
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+SESSION_SECRET=

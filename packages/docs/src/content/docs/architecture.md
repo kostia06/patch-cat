@@ -1,0 +1,112 @@
+---
+title: Architecture
+description: How Patch generates, stores, runs, and ships tools — and where every trust boundary sits.
+sidebar:
+  order: 3
+---
+
+Patch is three things stitched together: a **local MCP server**, a **community registry**, and a **sandboxed runtime**. Each has a clear job; the seams between them are the parts you should care about.
+
+## The local MCP server (`@patch-cat/mcp`)
+
+Runs as a child process of your AI host (Claude Desktop, Cursor, Claude Code, Windsurf), communicating over MCP's stdio transport. Lives in your terminal, doesn't phone home unless you opt in.
+
+**Responsibilities:**
+
+- Exposes a small set of meta-tools (`patch_generate_tool`, `patch_run_tool`, `patch_list_tools`, `patch_confirm_action`, `patch_list_runs`, `patch_replay`, `patch_auth_register`, `patch_auth_status`).
+- Dynamically registers each tool in your local toolbox as a first-class MCP tool. When a new tool is generated or pulled, it sends `notifications/tools/list_changed` so the host refreshes its tool list within ~1 second.
+- Calls Claude Opus to generate Python tools, then sandbox-tests them in e2b before saving.
+- Routes invocations through the security stack: sanitizer → quarantine → taint check → confirmation gate → sandbox.
+- Writes a forensic audit blob for every successful execution.
+
+**State:**
+
+The toolbox persists at `env-paths('patch-cat')`:
+
+```
+patch-cat/
+├── tools/         one .py per tool, manifest frontmatter + body
+├── index.json     name → {version, file path, last-used timestamp}
+├── runs/          one .json per execution
+│   └── blobs/     content-addressed stdout/stderr by SHA-256
+└── config.json    registry URL, contribute opt-in, auth tokens
+```
+
+## The hosted registry (`@patch-cat/registry`)
+
+A Cloudflare Worker fronted by Hono, backed by Neon Postgres + R2 + Workers AI.
+
+**Responsibilities:**
+
+- Stores tool source as immutable, content-addressed R2 blobs (`tools/{sha256}.py`).
+- Indexes tool metadata in `tools` + `tool_versions` Postgres tables; semantic search via pgvector HNSW on description embeddings.
+- GitHub OAuth for contributor identity. Bearer-token-protected `POST /v1/tools` for contributions.
+- Quarantine LLM endpoint (`POST /v1/quarantine/summarize`) that any client can hit to summarize untrusted text.
+- Self-refactoring proposals via a nightly Worker cron + a daily GitHub Actions runner.
+
+**Trust boundary:** the registry serves as the *coordination* layer, not as a trust anchor for code execution. The local MCP server still re-validates every manifest schema, every Unicode payload, and every contributor reputation signal before pulling a tool.
+
+## The sandboxed runtime (e2b)
+
+Every Python tool runs in an [e2b](https://e2b.dev) sandbox. The sandbox is created with `allowInternetAccess` derived from the tool's manifest:
+
+- `network: false` → sandbox boots with no internet access. e2b enforces at the provider layer; the manifest declaration matches the runtime constraint by construction.
+- `network: true` → default sandbox.
+
+The sandbox receives:
+
+- The tool source at `/tmp/tool.py`
+- The args JSON at `/tmp/args.json`
+- An optional `PATCH_ACCESS_TOKEN` env (Arcade-minted, scoped, short-lived) for tools with `external_auth`
+
+The sandbox runs `python /tmp/tool.py < /tmp/args.json`. Output is JSON on the last line of stdout. Sandbox is destroyed after every invocation — no shared state.
+
+**What's NOT enforced today:** filesystem capability scopes (`read-only`, `read-write`, `none`) are advertised by the manifest but e2b's SDK doesn't expose a documented filesystem isolation knob. Honest gap; v0.4.x.
+
+## Trust boundaries
+
+```
+Host AI ──[MCP stdio]──> Patch local ──[HTTPS]──> Registry ──[R2]──> tool source
+                            │
+                            └──[e2b API]──> sandbox ──[network if allowed]──> external APIs
+                                              ▲
+                                              │ PATCH_ACCESS_TOKEN
+                            Patch local ──────┴──[Arcade]──> external service
+```
+
+Every solid line crossing into a new box is a trust boundary that Patch validates:
+
+- **Host AI → Patch local:** MCP request schema; tool name allowlist; argument types from manifest.
+- **Patch local → Registry:** TLS + bearer-token auth on contribute; SHA-256 verification on fetched source against recorded hash.
+- **Patch local → e2b:** capability flags pinned at sandbox-create time, not negotiable later.
+- **Patch local → Arcade:** scope strings explicit in manifest; tokens never enter the sandbox process env keys (the *value* is injected; the *refresh token* stays at Arcade).
+
+## Replay
+
+`patch_replay({ run_id })` reads an audit blob and re-runs the recorded inputs against the recorded source in a fresh sandbox. It reports three things honestly:
+
+| Field | Possible values | Meaning |
+|-------|----------------|---------|
+| `source_match` | `true` / `false` | Local copy of the tool's source matches the recorded SHA-256. |
+| `sandbox_match` | object | Capabilities + `allowInternetAccess` match what was used. |
+| `output_match` | `"yes"` / `"no"` / `"na_non_deterministic"` | What replay actually proves about the output. |
+
+The `na_non_deterministic` case is what most replay systems gloss over. If a tool was declared `network: true` and replay produces a different output, that's *expected* — the external world (HTTP responses, wall-clock, search results) isn't part of the audit blob. Replay confirms the tool RAN as recorded; it cannot guarantee output equivalence for tools that depend on external state.
+
+A `"no"` verdict for a `network: false` tool, on the other hand, is a real finding worth investigating: clock-dependent code, unseeded randomness, or a non-deterministic dependency.
+
+This is documented in detail in the [threat model](/threat-model).
+
+## Stack lock
+
+The stack choices are fixed (the project's [`CLAUDE.md`](https://github.com/patch-cat/patch-cat/blob/main/CLAUDE.md) is the source of truth):
+
+- TypeScript + Node 20+ for the local server
+- `@modelcontextprotocol/sdk` for protocol
+- `@anthropic-ai/sdk`, model `claude-opus-4-7`, for tool generation
+- `@e2b/code-interpreter` for sandboxing
+- Cloudflare Workers + Hono + Drizzle + Neon + R2 for the registry
+- Workers AI Llama 3.3 70B for the quarantine LLM
+- Arcade.dev for OAuth-mediated external auth
+
+The docs site stack (Astro + Starlight) is the only stack choice not in `CLAUDE.md`; documented in the registry README.

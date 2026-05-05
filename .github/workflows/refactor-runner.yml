@@ -1,0 +1,35 @@
+name: Refactor runner
+
+on:
+  schedule:
+    # 04:00 UTC daily — ~40 minutes after the registry's nightly candidate
+    # finder so any new candidates are visible.
+    - cron: "0 4 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: refactor-runner
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      - name: Run refactor proposal generator
+        env:
+          PATCH_REGISTRY_URL: ${{ vars.PATCH_REGISTRY_URL }}
+          PATCH_RUNNER_TOKEN: ${{ secrets.PATCH_RUNNER_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          E2B_API_KEY: ${{ secrets.E2B_API_KEY }}
+        run: node scripts/refactor-runner.mjs

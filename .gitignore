@@ -1,0 +1,15 @@
+node_modules/
+dist/
+coverage/
+.env
+.env.local
+.dev.vars
+*.log
+.DS_Store
+.vscode/
+.idea/
+*.tsbuildinfo
+.wrangler/
+.claude/
+.astro/
+*.tgz

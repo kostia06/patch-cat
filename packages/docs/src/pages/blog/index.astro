@@ -1,0 +1,88 @@
+---
+const posts = [
+  {
+    title: "Patch — letting AI assistants grow capabilities and share them",
+    href: "/blog/launching-patch",
+    pubDate: "2026-05-04",
+    description:
+      "A small, opinionated MCP server that gives any AI host a permanent, growing toolbox of executable Python tools. Including the part nobody else writes — what it doesn't do.",
+  },
+];
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Blog — Patch</title>
+    <link rel="icon" type="image/svg+xml" href="/cat-mark.svg" />
+    <style>
+      body {
+        margin: 0;
+        background: #000;
+        color: #fff;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      }
+      .container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 80px 24px;
+      }
+      .nav a {
+        color: #999;
+        text-decoration: none;
+        margin-right: 16px;
+      }
+      .nav a:hover {
+        color: #fff;
+      }
+      h1 {
+        font-size: 32px;
+        margin: 32px 0 8px;
+      }
+      .post {
+        margin-top: 48px;
+        padding-top: 32px;
+        border-top: 1px solid #222;
+      }
+      .post h2 {
+        font-size: 20px;
+        margin: 0 0 6px;
+      }
+      .post a {
+        color: #fff;
+        text-decoration: none;
+      }
+      .post a:hover {
+        text-decoration: underline;
+      }
+      .post .meta {
+        color: #999;
+        font-size: 13px;
+        margin-bottom: 12px;
+      }
+      .post p {
+        line-height: 1.55;
+        color: #ccc;
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <nav class="nav">
+        <a href="/">← patch</a>
+      </nav>
+      <h1>Blog</h1>
+      {
+        posts.map((p) => (
+          <div class="post">
+            <h2><a href={p.href}>{p.title}</a></h2>
+            <div class="meta">{p.pubDate}</div>
+            <p>{p.description}</p>
+          </div>
+        ))
+      }
+    </div>
+  </body>
+</html>

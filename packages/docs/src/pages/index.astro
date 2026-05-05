@@ -1,0 +1,271 @@
+---
+// Custom landing page. Astro's pages/ takes precedence over Starlight's
+// docs/ for the root, so this is what visitors see at patch-cat.com/.
+const title = "Patch — the capability layer for AI assistants";
+const description =
+  "An MCP server that lets your AI assistant build and remember its own tools — and pulls from a community registry shaped by every Patch user.";
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content="/og-default.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" type="image/svg+xml" href="/cat-mark.svg" />
+    <style>
+      :root {
+        --bg: #000;
+        --fg: #fff;
+        --muted: #999;
+        --hair: #222;
+        --mono: "SF Mono", "JetBrains Mono", Menlo, monospace;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        min-height: 100vh;
+      }
+      a {
+        color: var(--fg);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      a:hover {
+        text-decoration: none;
+      }
+      .container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 80px 24px 120px;
+      }
+      .nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 14px;
+        margin-bottom: 80px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+      .brand img {
+        width: 22px;
+        height: 22px;
+      }
+      .nav a {
+        margin-left: 20px;
+        text-decoration: none;
+        opacity: 0.85;
+      }
+      .nav a:hover {
+        opacity: 1;
+      }
+      h1 {
+        font-size: clamp(36px, 6vw, 56px);
+        line-height: 1.05;
+        letter-spacing: -0.02em;
+        font-weight: 700;
+        margin: 0 0 24px;
+      }
+      .lede {
+        font-size: 19px;
+        line-height: 1.5;
+        color: var(--muted);
+        margin: 0 0 48px;
+        max-width: 560px;
+      }
+      .cta-row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 64px;
+      }
+      .btn-primary,
+      .btn-secondary {
+        display: inline-flex;
+        align-items: center;
+        padding: 12px 18px;
+        font-weight: 600;
+        font-size: 14px;
+        text-decoration: none;
+        border: 1.5px solid var(--fg);
+      }
+      .btn-primary {
+        background: var(--fg);
+        color: var(--bg);
+      }
+      .btn-secondary {
+        background: transparent;
+        color: var(--fg);
+      }
+      .btn-primary:hover {
+        background: transparent;
+        color: var(--fg);
+      }
+      .btn-secondary:hover {
+        background: var(--fg);
+        color: var(--bg);
+      }
+      pre {
+        background: #0a0a0a;
+        border: 1px solid var(--hair);
+        padding: 16px 20px;
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.6;
+        overflow-x: auto;
+        white-space: pre;
+        margin: 0 0 32px;
+      }
+      pre code {
+        color: var(--fg);
+      }
+      h2 {
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin: 64px 0 16px;
+        color: var(--muted);
+      }
+      ul {
+        padding-left: 18px;
+        line-height: 1.7;
+      }
+      li {
+        margin-bottom: 6px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+        margin-bottom: 16px;
+      }
+      @media (max-width: 600px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      footer {
+        margin-top: 80px;
+        padding-top: 24px;
+        border-top: 1px solid var(--hair);
+        font-size: 13px;
+        color: var(--muted);
+        display: flex;
+        justify-content: space-between;
+      }
+      footer a {
+        color: var(--muted);
+        opacity: 0.85;
+        text-decoration: none;
+      }
+      footer a:hover {
+        color: var(--fg);
+      }
+      .pixel-cat-slot {
+        width: 64px;
+        height: 64px;
+        margin-bottom: 32px;
+        opacity: 0.95;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <nav class="nav">
+        <div class="brand">
+          <img src="/cat-mark.svg" alt="" />
+          patch
+        </div>
+        <div>
+          <a href="/quickstart">quickstart</a>
+          <a href="/threat-model">threat model</a>
+          <a href="/blog">blog</a>
+          <a href="https://github.com/patch-cat/patch-cat">github</a>
+        </div>
+      </nav>
+
+      <img class="pixel-cat-slot" src="/cat-mark.svg" alt="" />
+
+      <h1>The capability layer for AI assistants.</h1>
+      <p class="lede">
+        Patch is an MCP server that lets your AI assistant build and remember its own tools — and
+        pulls from a community registry shaped by every Patch user.
+      </p>
+
+      <div class="cta-row">
+        <a class="btn-primary" href="/quickstart">install in 30 seconds</a>
+        <a class="btn-secondary" href="/threat-model">read the threat model</a>
+      </div>
+
+      <h2>Quickstart</h2>
+      <pre><code>{`{
+  "mcpServers": {
+    "patch-cat": {
+      "command": "npx",
+      "args": ["-y", "@patch-cat/mcp"],
+      "env": {
+        "ANTHROPIC_API_KEY": "sk-ant-...",
+        "E2B_API_KEY": "e2b_..."
+      }
+    }
+  }
+}`}</code></pre>
+
+      <p style="font-size: 14px; color: var(--muted); margin-top: -16px;">
+        Drop into Claude Desktop's <code class="lp-mono">claude_desktop_config.json</code> (or the
+        equivalent for Cursor / Claude Code / Windsurf). Restart the host. Done. Full instructions
+        in the <a href="/quickstart">quickstart</a>.
+      </p>
+
+      <div class="grid">
+        <div>
+          <h2>What it does</h2>
+          <ul>
+            <li>Generates Python tools on demand from natural-language descriptions.</li>
+            <li>Sandbox-tests them in e2b before persisting.</li>
+            <li>Pulls from the public registry when a similar tool already exists.</li>
+            <li>Survives across restarts. Tools persist locally.</li>
+          </ul>
+        </div>
+        <div>
+          <h2>What it defends against</h2>
+          <ul>
+            <li>Hidden Unicode injection in untrusted text.</li>
+            <li>Prompt injection via tool descriptions and outputs.</li>
+            <li>Capability escape — tools declared <code class="lp-mono">network: false</code> can't reach the network.</li>
+            <li>OAuth scope creep via Arcade-mediated tokens.</li>
+          </ul>
+          <p style="font-size: 13px; color: var(--muted); margin-top: 12px;">
+            And we're honest about <a href="/threat-model#whats-still-possible">what's still possible</a>.
+          </p>
+        </div>
+      </div>
+
+      <footer>
+        <span>MIT licensed. Copyright 2026.</span>
+        <span>
+          <a href="https://github.com/patch-cat/patch-cat">github</a>
+          <span style="margin: 0 8px;">·</span>
+          <a href="mailto:security@patch-cat.com">security</a>
+        </span>
+      </footer>
+    </div>
+  </body>
+</html>

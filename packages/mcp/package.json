@@ -1,0 +1,54 @@
+{
+  "name": "@patch-cat/mcp",
+  "version": "0.3.0",
+  "description": "MCP server that lets any AI assistant generate, persist, and reuse Python tools on demand.",
+  "license": "MIT",
+  "author": "",
+  "type": "module",
+  "bin": {
+    "patch-cat-mcp": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "biome check src",
+    "format": "biome format --write src",
+    "typecheck": "tsc --noEmit",
+    "verify:e2e": "node --env-file=../../.env scripts/verify-e2e.mjs",
+    "prepublishOnly": "pnpm build"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.65.0",
+    "@e2b/code-interpreter": "^1.5.0",
+    "@modelcontextprotocol/sdk": "^1.18.0",
+    "@patch-cat/shared": "workspace:*",
+    "env-paths": "^3.0.0",
+    "pino": "^9.5.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.5"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "anthropic",
+    "claude",
+    "ai",
+    "tools",
+    "patch-cat"
+  ]
+}

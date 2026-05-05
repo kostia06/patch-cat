@@ -1,0 +1,74 @@
+[
+  {
+    "name_hint": "fetch_url",
+    "description": "Fetch a URL via HTTP GET and return the response body as a string. The single input is 'url' (string)."
+  },
+  {
+    "name_hint": "fetch_json",
+    "description": "Fetch a URL via HTTP GET and return the response body parsed as JSON. The single input is 'url' (string)."
+  },
+  {
+    "name_hint": "extract_pdf_text",
+    "description": "Read a PDF file from a local path and return its full text content as a single string. Input: 'pdf_path' (string)."
+  },
+  {
+    "name_hint": "extract_html_tables",
+    "description": "Given a URL, fetch the page and return all HTML tables as a list of arrays of objects keyed by header. Input: 'url' (string)."
+  },
+  {
+    "name_hint": "parse_csv",
+    "description": "Parse CSV-formatted text into a list of rows as JSON objects keyed by the header. Input: 'csv_text' (string)."
+  },
+  {
+    "name_hint": "parse_tsv",
+    "description": "Parse TSV-formatted text (tab-separated, with header row) into a list of rows as JSON objects. Input: 'tsv_text' (string)."
+  },
+  {
+    "name_hint": "search_hacker_news",
+    "description": "Search Hacker News stories using the Algolia HN search API and return the top hits with title, url, points, num_comments. Inputs: 'query' (string), 'limit' (integer, default 10)."
+  },
+  {
+    "name_hint": "search_github_repos",
+    "description": "Search GitHub for public repositories matching a query (no auth required). Returns full_name, description, stars, language. Inputs: 'query' (string), 'limit' (integer, default 10)."
+  },
+  {
+    "name_hint": "read_rss_feed",
+    "description": "Fetch an RSS or Atom feed from a URL and return entries with title, link, summary, published. Input: 'url' (string)."
+  },
+  {
+    "name_hint": "extract_youtube_transcript",
+    "description": "Given a YouTube video ID or URL, return the transcript as a list of {text, start, duration} segments using the youtube-transcript-api package. Input: 'video' (string — id or url)."
+  },
+  {
+    "name_hint": "geocode_address",
+    "description": "Geocode an address using the Open-Meteo geocoding API (no API key). Returns latitude, longitude, country, name. Input: 'address' (string)."
+  },
+  {
+    "name_hint": "get_weather",
+    "description": "Get the current weather for a latitude/longitude using the Open-Meteo forecast API (no API key). Returns temperature_c, wind_speed, weather_code. Inputs: 'latitude' (number), 'longitude' (number)."
+  },
+  {
+    "name_hint": "convert_currency",
+    "description": "Convert an amount between currencies using the open exchangerate.host API (no API key). Returns the converted amount. Inputs: 'amount' (number), 'from' (string ISO code), 'to' (string ISO code)."
+  },
+  {
+    "name_hint": "parse_email_eml",
+    "description": "Parse the raw text of an .eml email file and return {from, to, subject, date, text_body, html_body, attachments}. Input: 'eml_text' (string)."
+  },
+  {
+    "name_hint": "markdown_to_html",
+    "description": "Render a Markdown string to HTML using the markdown package with safe defaults. Input: 'markdown' (string)."
+  },
+  {
+    "name_hint": "html_to_markdown",
+    "description": "Convert an HTML string to Markdown using html2text. Input: 'html' (string)."
+  },
+  {
+    "name_hint": "regex_findall",
+    "description": "Find all non-overlapping matches of a Python regex in a text string. Inputs: 'pattern' (string), 'text' (string)."
+  },
+  {
+    "name_hint": "json_query",
+    "description": "Extract values from a JSON object using a jq-style path expression via the jsonpath-ng package. Inputs: 'json' (object), 'path' (string)."
+  }
+]
