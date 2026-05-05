@@ -189,6 +189,16 @@ const description =
         background: #fff;
         border-radius: 8px;
       }
+      .cat-loop {
+        width: 100%;
+        max-width: 720px;
+        margin: 0 auto 32px;
+        display: block;
+        background: #fff;
+        border-radius: 8px;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+      }
     </style>
   </head>
   <body>
@@ -206,7 +216,7 @@ const description =
         </div>
       </nav>
 
-      <img class="pixel-cat-slot" src="/cat/keyboard.png" alt="A pixel-art tuxedo cat sitting smugly on a keyboard" />
+      <video class="cat-loop" src="/cat/cat-loop.mp4" autoplay loop muted playsinline aria-label="Pixel-art tuxedo cat in seven animated poses: hunting, head tilt, sleeping, gift, prowling, sitting on a keyboard, confused"></video>
 
       <h1>The capability layer for AI assistants.</h1>
       <p class="lede">
