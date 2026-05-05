@@ -99,7 +99,7 @@ This is documented in detail in the [threat model](/threat-model).
 
 ## Stack lock
 
-The stack choices are fixed (the project's [`CLAUDE.md`](https://github.com/patch-cat/patch-cat/blob/main/CLAUDE.md) is the source of truth):
+The stack choices are fixed:
 
 - TypeScript + Node 20+ for the local server
 - `@modelcontextprotocol/sdk` for protocol
@@ -109,4 +109,4 @@ The stack choices are fixed (the project's [`CLAUDE.md`](https://github.com/patc
 - Workers AI Llama 3.3 70B for the quarantine LLM
 - Arcade.dev for OAuth-mediated external auth
 
-The docs site stack (Astro + Starlight) is the only stack choice not in `CLAUDE.md`; documented in the registry README.
+The docs site stack (Astro + Starlight) is the only stack choice deliberately outside the lock; documented in the registry README.

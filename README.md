@@ -18,7 +18,7 @@ This is the source-of-truth monorepo for [Patch](https://patch-cat.com), an MCP 
 
 For end-user setup, start with [`packages/mcp/README.md`](./packages/mcp/README.md).
 
-For the architectural rules and stack lock-in, see [`CLAUDE.md`](./CLAUDE.md).
+Architectural rules and stack lock-in are documented internally; the highlights surface in [`packages/docs/src/content/docs/architecture.md`](./packages/docs/src/content/docs/architecture.md) and [`THREAT_MODEL.md`](./THREAT_MODEL.md).
 
 ## Development
 
