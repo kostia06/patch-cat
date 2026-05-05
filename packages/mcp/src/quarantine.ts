@@ -72,10 +72,7 @@ export function createQuarantineClient(config: QuarantineConfig): QuarantineClie
             : [],
         };
       } catch (error) {
-        config.logger?.warn(
-          { err: error },
-          "Quarantine fetch threw; defaulting to suspicious.",
-        );
+        config.logger?.warn({ err: error }, "Quarantine fetch threw; defaulting to suspicious.");
         return synthesizeUnreachable();
       } finally {
         clearTimeout(timer);

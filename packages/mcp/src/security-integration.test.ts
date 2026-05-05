@@ -8,16 +8,16 @@ import { join } from "node:path";
 import type Anthropic from "@anthropic-ai/sdk";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
-import { parseManifest, type ToolManifest } from "@patch-cat/shared";
+import { type ToolManifest, parseManifest } from "@patch-cat/shared";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ArcadeClient } from "./arcade.js";
 import { type AnthropicMessagesClient, createGenerator } from "./generator.js";
 import { NOOP_REGISTRY_CLIENT } from "./registry-client.js";
 import {
   type CommandResult,
-  createSandboxRunner,
   type SandboxFactory,
   type SandboxLike,
+  createSandboxRunner,
 } from "./sandbox.js";
 import { createPatchServer } from "./server.js";
 import { createToolbox } from "./toolbox.js";
@@ -65,7 +65,9 @@ function makeStubAnthropic(text: string): AnthropicMessagesClient {
   };
 }
 
-function makeStubSandboxFactory(stdoutByCommand: (cmd: string) => string = () => '"OK"'): SandboxFactory {
+function makeStubSandboxFactory(
+  stdoutByCommand: (cmd: string) => string = () => '"OK"',
+): SandboxFactory {
   const sandbox: SandboxLike = {
     files: { async write() {} },
     commands: {
@@ -276,10 +278,7 @@ describe("security: taint -> confirmation_required -> retry", () => {
 
     const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
     client = new Client({ name: "sec-test", version: "0.0.1" }, { capabilities: {} });
-    await Promise.all([
-      server.mcp.connect(serverTransport),
-      client.connect(clientTransport),
-    ]);
+    await Promise.all([server.mcp.connect(serverTransport), client.connect(clientTransport)]);
     return client;
   }
 
@@ -366,10 +365,7 @@ describe("security: human_confirm capability", () => {
 
     const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
     client = new Client({ name: "hitl-test", version: "0.0.1" }, { capabilities: {} });
-    await Promise.all([
-      server.mcp.connect(serverTransport),
-      client.connect(clientTransport),
-    ]);
+    await Promise.all([server.mcp.connect(serverTransport), client.connect(clientTransport)]);
 
     const blocked = await client.callTool({
       name: "send_email",
@@ -430,10 +426,7 @@ describe("security: external_auth via Arcade", () => {
 
     const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
     client = new Client({ name: "arcade-test", version: "0.0.1" }, { capabilities: {} });
-    await Promise.all([
-      server.mcp.connect(serverTransport),
-      client.connect(clientTransport),
-    ]);
+    await Promise.all([server.mcp.connect(serverTransport), client.connect(clientTransport)]);
 
     const result = await client.callTool({
       name: "read_inbox",
@@ -498,10 +491,7 @@ describe("security: external_auth via Arcade", () => {
 
     const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
     client = new Client({ name: "arcade-test-2", version: "0.0.1" }, { capabilities: {} });
-    await Promise.all([
-      server.mcp.connect(serverTransport),
-      client.connect(clientTransport),
-    ]);
+    await Promise.all([server.mcp.connect(serverTransport), client.connect(clientTransport)]);
 
     const result = await client.callTool({
       name: "read_inbox",

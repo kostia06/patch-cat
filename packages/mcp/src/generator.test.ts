@@ -1,6 +1,6 @@
 import type Anthropic from "@anthropic-ai/sdk";
-import { describe, expect, it, vi } from "vitest";
 import { GeneratorError, ManifestParseError, ToolNameCollisionError } from "@patch-cat/shared";
+import { describe, expect, it, vi } from "vitest";
 import { type AnthropicMessagesClient, createGenerator } from "./generator.js";
 
 const VALID_RESPONSE = `# ---

@@ -1,9 +1,14 @@
 import { existsSync } from "node:fs";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import envPaths from "env-paths";
 import { ToolNameCollisionError, ToolNotFoundError } from "@patch-cat/shared";
-import { type ParsedTool, parseManifest, serializeManifest, type ToolManifest } from "@patch-cat/shared";
+import {
+  type ParsedTool,
+  type ToolManifest,
+  parseManifest,
+  serializeManifest,
+} from "@patch-cat/shared";
+import envPaths from "env-paths";
 
 export interface ToolEntry {
   name: string;

@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 import {
+  NOOP_QUARANTINE_CLIENT,
   createQuarantineClient,
   flagsIndicateInjection,
-  NOOP_QUARANTINE_CLIENT,
 } from "./quarantine.js";
 
 function makeFetch(handler: (url: string, init?: RequestInit) => Response) {
@@ -33,9 +33,7 @@ describe("flagsIndicateInjection", () => {
   });
 
   it("returns true if any flag is dangerous", () => {
-    expect(
-      flagsIndicateInjection(["malformed_response", "encoded_payload"]),
-    ).toBe(true);
+    expect(flagsIndicateInjection(["malformed_response", "encoded_payload"])).toBe(true);
   });
 });
 

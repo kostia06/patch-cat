@@ -1,11 +1,11 @@
-import { describe, expect, it, vi } from "vitest";
 import { ToolOutputError } from "@patch-cat/shared";
 import type { ParsedTool } from "@patch-cat/shared";
+import { describe, expect, it, vi } from "vitest";
 import {
   type CommandResult,
-  createSandboxRunner,
   type SandboxFactory,
   type SandboxLike,
+  createSandboxRunner,
 } from "./sandbox.js";
 
 function makeParsedTool(packages: string[] = []): ParsedTool {

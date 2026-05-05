@@ -80,8 +80,7 @@ export async function runQuarantine(
     return { summary, flags };
   } catch {
     return {
-      summary:
-        "(quarantine LLM returned malformed JSON; treating input as suspicious)",
+      summary: "(quarantine LLM returned malformed JSON; treating input as suspicious)",
       flags: ["malformed_response"],
     };
   }

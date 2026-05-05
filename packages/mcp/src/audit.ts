@@ -9,9 +9,9 @@
 //   <toolbox>/runs/blobs/<stdout_sha256>.txt      — full stdout (content-addressed; dedupes)
 //   <toolbox>/runs/blobs/<stderr_sha256>.txt      — full stderr
 
+import { createHash, randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { createHash, randomUUID } from "node:crypto";
 import { join } from "node:path";
 
 export const AUDIT_SCHEMA_VERSION = "1";

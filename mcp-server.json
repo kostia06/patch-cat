@@ -37,14 +37,32 @@
     "optional": ["ARCADE_API_KEY", "PATCH_CAT_TOOLBOX_DIR", "LOG_LEVEL"]
   },
   "tools": [
-    { "name": "patch_generate_tool", "description": "Generate or pull a tool that fulfills a description." },
+    {
+      "name": "patch_generate_tool",
+      "description": "Generate or pull a tool that fulfills a description."
+    },
     { "name": "patch_run_tool", "description": "Explicitly invoke a tool by name." },
     { "name": "patch_list_tools", "description": "List every tool in the local toolbox." },
-    { "name": "patch_confirm_action", "description": "Approve a tool call previously blocked by tainted-input or human-confirm gating." },
-    { "name": "patch_list_runs", "description": "List recent tool execution runs from the local audit log." },
-    { "name": "patch_replay", "description": "Replay a recorded run; reports output_match yes/no/n_a-non-deterministic." },
-    { "name": "patch_auth_register", "description": "Authorize this Patch instance for registry contribution or external-service auth." },
-    { "name": "patch_auth_status", "description": "Show registry read/contribute status and external_auth state." }
+    {
+      "name": "patch_confirm_action",
+      "description": "Approve a tool call previously blocked by tainted-input or human-confirm gating."
+    },
+    {
+      "name": "patch_list_runs",
+      "description": "List recent tool execution runs from the local audit log."
+    },
+    {
+      "name": "patch_replay",
+      "description": "Replay a recorded run; reports output_match yes/no/n_a-non-deterministic."
+    },
+    {
+      "name": "patch_auth_register",
+      "description": "Authorize this Patch instance for registry contribution or external-service auth."
+    },
+    {
+      "name": "patch_auth_status",
+      "description": "Show registry read/contribute status and external_auth state."
+    }
   ],
   "security": {
     "threatModelUrl": "https://patch-cat.com/threat-model",

@@ -13,7 +13,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { jsonError, requireAuth } from "../auth.js";
 import { getDb } from "../db/client.js";
-import { refactorProposals, type RefactorProposal } from "../db/schema.js";
+import { type RefactorProposal, refactorProposals } from "../db/schema.js";
 import type { AppVariables, Env } from "../env.js";
 
 const StatusSchema = z.enum([
@@ -28,9 +28,15 @@ const StatusSchema = z.enum([
 const ResultSchema = z.object({
   status: StatusSchema,
   proposed_manifest_yaml: z.string().optional(),
-  proposed_source_sha256: z.string().regex(/^[0-9a-f]{64}$/).optional(),
+  proposed_source_sha256: z
+    .string()
+    .regex(/^[0-9a-f]{64}$/)
+    .optional(),
   equivalence_failure_reason: z.string().optional(),
-  runner_log_sha256: z.string().regex(/^[0-9a-f]{64}$/).optional(),
+  runner_log_sha256: z
+    .string()
+    .regex(/^[0-9a-f]{64}$/)
+    .optional(),
 });
 
 export const refactorRouter = new Hono<{ Bindings: Env; Variables: AppVariables }>();

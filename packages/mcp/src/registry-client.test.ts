@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { createRegistryClient, RegistryHttpError } from "./registry-client.js";
+import { RegistryHttpError, createRegistryClient } from "./registry-client.js";
 
 const SAMPLE_TOOL_VERSION = {
   name: "fetch_url",
@@ -103,13 +103,17 @@ describe("RegistryClient.contributeTool", () => {
   it("requires a contribute token", async () => {
     const fetchImpl = makeFetch(() => jsonResponse({}, 200));
     const client = createRegistryClient({ baseUrl: "https://r.example.com", fetchImpl });
-    await expect(
-      client.contributeTool(SAMPLE_TOOL_VERSION.manifest, "source"),
-    ).rejects.toThrow(/Contribute token not configured/);
+    await expect(client.contributeTool(SAMPLE_TOOL_VERSION.manifest, "source")).rejects.toThrow(
+      /Contribute token not configured/,
+    );
   });
 
   it("posts to /v1/tools with bearer token", async () => {
-    const seen: { url: string; auth: string | null; body: unknown } = { url: "", auth: null, body: null };
+    const seen: { url: string; auth: string | null; body: unknown } = {
+      url: "",
+      auth: null,
+      body: null,
+    };
     const fetchImpl = makeFetch((url, init) => {
       seen.url = url;
       seen.auth = (init?.headers as Headers).get("Authorization");

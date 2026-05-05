@@ -102,10 +102,7 @@ export const refactorProposals = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => ({
-    pairUnique: uniqueIndex("refactor_proposals_pair_idx").on(
-      table.toolNameA,
-      table.toolNameB,
-    ),
+    pairUnique: uniqueIndex("refactor_proposals_pair_idx").on(table.toolNameA, table.toolNameB),
     statusIdx: index("refactor_proposals_status_idx").on(table.status),
   }),
 );

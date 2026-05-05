@@ -5,8 +5,8 @@ import { createArcadeClient } from "./arcade.js";
 import { loadConfig } from "./config.js";
 import { createGenerator } from "./generator.js";
 import { createLogger } from "./logger.js";
-import { createLangfuseTracer, NOOP_TRACER } from "./observability.js";
-import { createRegistryClient, NOOP_REGISTRY_CLIENT } from "./registry-client.js";
+import { NOOP_TRACER, createLangfuseTracer } from "./observability.js";
+import { NOOP_REGISTRY_CLIENT, createRegistryClient } from "./registry-client.js";
 import { createE2BSandboxFactory, createSandboxRunner } from "./sandbox.js";
 import { createPatchServer } from "./server.js";
 import { createToolbox } from "./toolbox.js";
@@ -152,6 +152,8 @@ function printHelp(): void {
 }
 
 main().catch((error) => {
-  process.stderr.write(`fatal: ${error instanceof Error ? error.stack ?? error.message : String(error)}\n`);
+  process.stderr.write(
+    `fatal: ${error instanceof Error ? (error.stack ?? error.message) : String(error)}\n`,
+  );
   process.exit(1);
 });

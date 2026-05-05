@@ -1,17 +1,17 @@
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import type Anthropic from "@anthropic-ai/sdk";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { ToolListChangedNotificationSchema } from "@modelcontextprotocol/sdk/types.js";
-import type Anthropic from "@anthropic-ai/sdk";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { type AnthropicMessagesClient, createGenerator } from "./generator.js";
 import {
   type CommandResult,
-  createSandboxRunner,
   type SandboxFactory,
   type SandboxLike,
+  createSandboxRunner,
 } from "./sandbox.js";
 import { createPatchServer } from "./server.js";
 import { createToolbox } from "./toolbox.js";
@@ -140,19 +140,13 @@ describe("integration", () => {
     await server.start();
 
     const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
-    client = new Client(
-      { name: "test-client", version: "0.0.1" },
-      { capabilities: {} },
-    );
+    client = new Client({ name: "test-client", version: "0.0.1" }, { capabilities: {} });
 
     client.setNotificationHandler(ToolListChangedNotificationSchema, async () => {
       listChangedCount += 1;
     });
 
-    await Promise.all([
-      server.mcp.connect(serverTransport),
-      client.connect(clientTransport),
-    ]);
+    await Promise.all([server.mcp.connect(serverTransport), client.connect(clientTransport)]);
   });
 
   afterEach(async () => {

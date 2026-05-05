@@ -5,26 +5,22 @@ import {
   type Tool,
 } from "@modelcontextprotocol/sdk/types.js";
 import {
-  manifestToInputSchema,
   PatchError,
-  serializeManifest,
-  ToolNotFoundError,
   type ToolManifest,
+  ToolNotFoundError,
+  manifestToInputSchema,
+  serializeManifest,
 } from "@patch-cat/shared";
 import type { Logger } from "pino";
 import { type ArcadeClient, NOOP_ARCADE_CLIENT, providersFromScopes } from "./arcade.js";
 import { type AuditBlob, type AuditWriter, createAuditWriter, sha256 } from "./audit.js";
 import { startOAuthListener } from "./auth-flow.js";
-import {
-  type ConfirmationStore,
-  createConfirmationStore,
-  summarizeArgs,
-} from "./confirmation.js";
-import { loadConfig, saveConfig, type PatchConfig } from "./config.js";
+import { type PatchConfig, loadConfig, saveConfig } from "./config.js";
+import { type ConfirmationStore, createConfirmationStore, summarizeArgs } from "./confirmation.js";
 import type { Generator } from "./generator.js";
 import { NOOP_REGISTRY_CLIENT, type RegistryClient } from "./registry-client.js";
 import type { SandboxRunner } from "./sandbox.js";
-import { createTaintTracker, findTaintedInputs, type TaintTracker } from "./taint.js";
+import { type TaintTracker, createTaintTracker, findTaintedInputs } from "./taint.js";
 import type { Toolbox } from "./toolbox.js";
 
 const META_GENERATE = "patch_generate_tool";
@@ -299,10 +295,7 @@ export function createPatchServer(deps: ServerDeps): PatchServer {
           );
         })
         .catch((error) => {
-          logger.warn(
-            { err: error, tool: parsed.manifest.name },
-            "Failed to contribute tool.",
-          );
+          logger.warn({ err: error, tool: parsed.manifest.name }, "Failed to contribute tool.");
         });
     }
 
@@ -390,10 +383,7 @@ export function createPatchServer(deps: ServerDeps): PatchServer {
     }));
   }
 
-  async function handleDynamicCall(
-    name: string,
-    args: Record<string, unknown>,
-  ): Promise<unknown> {
+  async function handleDynamicCall(name: string, args: Record<string, unknown>): Promise<unknown> {
     return invokeTool(name, args);
   }
 
@@ -524,7 +514,10 @@ export function createPatchServer(deps: ServerDeps): PatchServer {
         });
         logger.debug({ tool: name, run_id: blob.run_id }, "Audit blob written.");
       } catch (auditErr) {
-        logger.warn({ err: auditErr, tool: name }, "Failed to write audit blob (run not persisted).");
+        logger.warn(
+          { err: auditErr, tool: name },
+          "Failed to write audit blob (run not persisted).",
+        );
       }
 
       return result.result;
@@ -546,9 +539,7 @@ export function createPatchServer(deps: ServerDeps): PatchServer {
     const limit = Math.min(Number(args.limit ?? 20) || 20, 200);
     const filterTool = optionalString(args, "tool_name");
     const blobs = await listRecentBlobs(auditWriter.runsDir, limit * 4);
-    const filtered = filterTool
-      ? blobs.filter((b) => b.tool.name === filterTool)
-      : blobs;
+    const filtered = filterTool ? blobs.filter((b) => b.tool.name === filterTool) : blobs;
     return filtered.slice(0, limit).map((b) => ({
       run_id: b.run_id,
       ran_at: b.ran_at,
@@ -582,7 +573,11 @@ export function createPatchServer(deps: ServerDeps): PatchServer {
         run_id: runId,
         replay_status: "source_changed",
         original: blob.tool,
-        current: { name: current.manifest.name, version: current.manifest.version, source_sha256: currentSourceSha },
+        current: {
+          name: current.manifest.name,
+          version: current.manifest.version,
+          source_sha256: currentSourceSha,
+        },
         message:
           "The local copy of this tool has different source than the recorded run. Replay would not faithfully reproduce the original; pin to the recorded version (or fetch from the registry by source_sha256) and retry.",
       };
@@ -739,8 +734,9 @@ function buildToolDescriptor(manifest: ToolManifest): Tool {
 
 function getHostApp(server: Server): string | null {
   try {
-    const version = (server as unknown as { getClientVersion?: () => { name?: string } | undefined })
-      .getClientVersion?.();
+    const version = (
+      server as unknown as { getClientVersion?: () => { name?: string } | undefined }
+    ).getClientVersion?.();
     if (typeof version?.name === "string") return version.name;
   } catch {
     /* swallow */
@@ -779,7 +775,6 @@ async function listRecentBlobs(runsDir: string, max: number): Promise<AuditBlob[
 
 function existsSyncSafe(path: string): boolean {
   try {
-    // biome-ignore lint/suspicious/noExplicitAny: Node's fs is loaded lazily
     const fs = require("node:fs") as typeof import("node:fs");
     return fs.existsSync(path);
   } catch {
@@ -795,7 +790,7 @@ function explainOutputMatch(
     return "Source, sandbox config, and output all match — replay is fully reproducible.";
   }
   if (outputMatch === "na_non_deterministic") {
-    return "Source and sandbox config match, but the tool was declared `network: true` and outputs differ. This is expected for tools that hit live external APIs (search results change, wall-clock differs, etc.). The replay confirms the tool RAN as recorded; it cannot guarantee the output is byte-equal because the external world is not part of the audit blob. See THREAT_MODEL.md → \"What replay actually proves.\"";
+    return 'Source and sandbox config match, but the tool was declared `network: true` and outputs differ. This is expected for tools that hit live external APIs (search results change, wall-clock differs, etc.). The replay confirms the tool RAN as recorded; it cannot guarantee the output is byte-equal because the external world is not part of the audit blob. See THREAT_MODEL.md → "What replay actually proves."';
   }
   return `Source matches but outputs differ on a tool declared \`network: false\`. Possible causes: clock-dependent code, /dev/urandom, env-var differences (envs: ${blob.sandbox.envs_keys.join(", ") || "none"}), or a non-deterministic dependency. This is a finding worth investigating.`;
 }

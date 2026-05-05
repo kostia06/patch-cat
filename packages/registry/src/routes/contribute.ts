@@ -1,19 +1,19 @@
-import { eq } from "drizzle-orm";
-import { Hono } from "hono";
-import yaml from "js-yaml";
 import {
   ContributeToolRequestSchema,
-  parseManifest,
-  sanitizeUntrusted,
   type ContributeToolResponse,
   type StrippedSpan,
   type ToolManifest,
+  parseManifest,
+  sanitizeUntrusted,
 } from "@patch-cat/shared";
-import type { AppVariables, Env } from "../env.js";
-import { jsonError, requireAuth, type AppContext } from "../auth.js";
+import { eq } from "drizzle-orm";
+import { Hono } from "hono";
+import yaml from "js-yaml";
+import { type AppContext, jsonError, requireAuth } from "../auth.js";
 import { getDb } from "../db/client.js";
 import { toolVersions, tools } from "../db/schema.js";
 import { embedDescription } from "../embeddings.js";
+import type { AppVariables, Env } from "../env.js";
 import { flagsIndicateInjection, runQuarantine } from "../quarantine-engine.js";
 import { R2Storage } from "../storage.js";
 
@@ -62,12 +62,7 @@ contributeRouter.post("/v1/tools", requireAuth, async (c) => {
   // ============================================================
   const sanitizationCheck = checkSanitization(manifest);
   if (sanitizationCheck) {
-    return jsonError(
-      c,
-      400,
-      "manifest_unsafe_unicode",
-      sanitizationCheck,
-    );
+    return jsonError(c, 400, "manifest_unsafe_unicode", sanitizationCheck);
   }
 
   // ============================================================
@@ -133,7 +128,11 @@ async function persistContribution(
 ): Promise<Response> {
   const db = getDb(c.env.DATABASE_URL);
 
-  const [existingTool] = await db.select().from(tools).where(eq(tools.name, manifest.name)).limit(1);
+  const [existingTool] = await db
+    .select()
+    .from(tools)
+    .where(eq(tools.name, manifest.name))
+    .limit(1);
 
   if (existingTool && existingTool.contributorId !== contributorId) {
     return jsonError(

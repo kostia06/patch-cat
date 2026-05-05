@@ -10,7 +10,10 @@ import {
 describe("TaintTracker", () => {
   it("records output and detects substring matches", () => {
     const tracker = createTaintTracker();
-    tracker.recordOutput("fetch_url", "Anthropic shipped Claude 5 today and the response was overwhelming.");
+    tracker.recordOutput(
+      "fetch_url",
+      "Anthropic shipped Claude 5 today and the response was overwhelming.",
+    );
 
     const r = tracker.isTainted("Anthropic shipped Claude 5 today");
     expect(r.tainted).toBe(true);
@@ -19,7 +22,10 @@ describe("TaintTracker", () => {
 
   it("returns false for too-short values to avoid false positives", () => {
     const tracker = createTaintTracker();
-    tracker.recordOutput("fetch_url", "hello world this is a long output that exceeds the threshold");
+    tracker.recordOutput(
+      "fetch_url",
+      "hello world this is a long output that exceeds the threshold",
+    );
 
     const r = tracker.isTainted("hello");
     expect(r.tainted).toBe(false);

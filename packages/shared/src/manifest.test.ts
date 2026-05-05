@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { ManifestParseError } from "./errors.js";
 import {
+  type ToolManifest,
   manifestToInputSchema,
   parseManifest,
   serializeManifest,
-  type ToolManifest,
 } from "./manifest.js";
 
 const VALID_TOOL = `# ---

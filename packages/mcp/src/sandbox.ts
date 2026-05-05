@@ -64,7 +64,11 @@ export interface RunResult {
 }
 
 export interface SandboxRunner {
-  runTool(parsed: ParsedTool, args: Record<string, unknown>, options?: RunOptions): Promise<RunResult>;
+  runTool(
+    parsed: ParsedTool,
+    args: Record<string, unknown>,
+    options?: RunOptions,
+  ): Promise<RunResult>;
   syntaxCheck(parsed: ParsedTool, options?: RunOptions): Promise<void>;
 }
 
@@ -213,9 +217,7 @@ function parseOutput(stdout: string, stderr: string): unknown {
 }
 
 function serializeForCheck(parsed: ParsedTool): string {
-  return parsed.body.startsWith("# ---")
-    ? parsed.body
-    : reconstruct(parsed);
+  return parsed.body.startsWith("# ---") ? parsed.body : reconstruct(parsed);
 }
 
 function reconstruct(parsed: ParsedTool): string {

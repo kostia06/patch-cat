@@ -29,9 +29,7 @@ export default defineConfig({
         },
         {
           label: "Security",
-          items: [
-            { label: "Threat model", link: "/threat-model" },
-          ],
+          items: [{ label: "Threat model", link: "/threat-model" }],
         },
         {
           label: "Reference",

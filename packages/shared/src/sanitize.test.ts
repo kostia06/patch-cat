@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { sanitizedText, sanitizeUntrusted } from "./sanitize.js";
+import { sanitizeUntrusted, sanitizedText } from "./sanitize.js";
 
 describe("sanitizeUntrusted — pass-through", () => {
   it("leaves plain ASCII unchanged", () => {

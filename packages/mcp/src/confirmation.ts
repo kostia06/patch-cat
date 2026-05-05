@@ -32,9 +32,7 @@ export interface ConfirmationStore {
   pendingCount(): number;
 }
 
-export function createConfirmationStore(
-  options: { ttlMs?: number } = {},
-): ConfirmationStore {
+export function createConfirmationStore(options: { ttlMs?: number } = {}): ConfirmationStore {
   const ttlMs = options.ttlMs ?? DEFAULT_TTL_MS;
   const map = new Map<string, PendingConfirmation>();
 

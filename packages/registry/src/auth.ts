@@ -7,7 +7,12 @@ export const SESSION_COOKIE = "patchcat_session";
 
 export type AppContext = Context<{ Bindings: Env; Variables: AppVariables }>;
 
-export function jsonError(c: AppContext, status: 400 | 401 | 403 | 404 | 409 | 500, code: string, message: string) {
+export function jsonError(
+  c: AppContext,
+  status: 400 | 401 | 403 | 404 | 409 | 500,
+  code: string,
+  message: string,
+) {
   return c.json({ error: { code, message } }, status);
 }
 
@@ -22,7 +27,7 @@ function extractToken(c: AppContext): string | null {
   return null;
 }
 
-export async function requireAuth(c: AppContext, next: Next): Promise<Response | void> {
+export async function requireAuth(c: AppContext, next: Next): Promise<Response | undefined> {
   const token = extractToken(c);
   if (!token) {
     return jsonError(c, 401, "missing_token", "Authentication required.");
@@ -39,4 +44,5 @@ export async function requireAuth(c: AppContext, next: Next): Promise<Response |
   });
 
   await next();
+  return undefined;
 }

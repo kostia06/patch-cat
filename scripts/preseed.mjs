@@ -13,11 +13,11 @@
 //   E2B_API_KEY             For sandbox-based syntax check.
 //   PATCH_CONTRIBUTE_TOKEN  Session JWT for the official contributor account.
 
-import { readFile, writeFile, mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 import { createInterface } from "node:readline/promises";
+import { fileURLToPath } from "node:url";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import yaml from "js-yaml";
@@ -27,7 +27,8 @@ const REPO_ROOT = resolve(__dirname, "..");
 const BIN = join(REPO_ROOT, "packages", "mcp", "dist", "index.js");
 
 const args = parseArgs(process.argv.slice(2));
-const registryUrl = args["registry-url"] ?? process.env.PATCH_REGISTRY_URL ?? "http://localhost:8787";
+const registryUrl =
+  args["registry-url"] ?? process.env.PATCH_REGISTRY_URL ?? "http://localhost:8787";
 const toolsFile = args["tools-file"] ?? join(REPO_ROOT, "scripts", "seed-tools.json");
 const contributeToken = process.env.PATCH_CONTRIBUTE_TOKEN;
 
@@ -128,7 +129,9 @@ try {
     console.log(source);
     console.log(`--- end ${generated.name}.py ---\n`);
 
-    const answer = (await rl.question(`Contribute "${generated.name}"? [y/N/q] `)).trim().toLowerCase();
+    const answer = (await rl.question(`Contribute "${generated.name}"? [y/N/q] `))
+      .trim()
+      .toLowerCase();
     if (answer === "q") {
       console.log("Aborting.");
       break;
@@ -168,7 +171,9 @@ try {
         continue;
       }
       const body = await resp.json();
-      console.log(`✓ contributed ${body.name}@${body.version} (${body.status}, sha256=${body.source_sha256.slice(0, 12)}…)`);
+      console.log(
+        `✓ contributed ${body.name}@${body.version} (${body.status}, sha256=${body.source_sha256.slice(0, 12)}…)`,
+      );
       summary.contributed += 1;
     } catch (error) {
       console.error(`✗ contribute threw:`, error);

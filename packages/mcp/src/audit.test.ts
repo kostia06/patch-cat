@@ -25,7 +25,11 @@ describe("AuditWriter", () => {
       packagesInstalled: ["requests==2.32.3"],
       allowInternetAccess: true,
       envsKeys: [],
-      trigger: { host_app: "claude-desktop", mcp_client_name: "claude-desktop", user_prompt_hash: null },
+      trigger: {
+        host_app: "claude-desktop",
+        mcp_client_name: "claude-desktop",
+        user_prompt_hash: null,
+      },
       inputs: { url: "https://example.com" },
       output: "<html>...</html>",
       stdout: '"<html>...</html>"\n',
@@ -84,9 +88,11 @@ describe("AuditWriter", () => {
     input.allowInternetAccess = false;
     const blob = await writer.recordRun(input);
 
-    expect(blob.capability_assertions.some((s) => s.includes("network: false") && s.includes("enforced"))).toBe(
-      true,
-    );
+    expect(
+      blob.capability_assertions.some(
+        (s) => s.includes("network: false") && s.includes("enforced"),
+      ),
+    ).toBe(true);
     expect(blob.capability_assertions.some((s) => s.includes("filesystem"))).toBe(true);
   });
 

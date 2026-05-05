@@ -111,7 +111,10 @@ export function parseManifest(pythonSource: string): ParsedTool {
     );
   }
 
-  const body = lines.slice(endIndex + 1).join("\n").replace(/^\n+/, "");
+  const body = lines
+    .slice(endIndex + 1)
+    .join("\n")
+    .replace(/^\n+/, "");
 
   return { manifest: result.data, body };
 }

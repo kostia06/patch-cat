@@ -11,14 +11,14 @@
 //
 // The user must complete the GitHub OAuth flow in their browser when prompted.
 
-import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import envPaths from "env-paths";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { LoggingMessageNotificationSchema } from "@modelcontextprotocol/sdk/types.js";
+import envPaths from "env-paths";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const REPO_ROOT = resolve(__dirname, "..");
@@ -41,9 +41,7 @@ const toolboxDir = envPaths("patch-cat", { suffix: "" }).config;
 await mkdir(toolboxDir, { recursive: true });
 const configPath = join(toolboxDir, "config.json");
 
-const existingConfig = existsSync(configPath)
-  ? JSON.parse(await readFile(configPath, "utf8"))
-  : {};
+const existingConfig = existsSync(configPath) ? JSON.parse(await readFile(configPath, "utf8")) : {};
 const newConfig = {
   ...existingConfig,
   registry: {

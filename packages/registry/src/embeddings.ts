@@ -11,11 +11,7 @@ export async function embedDescription(
   }
 
   const aiOptions = options.gatewayName ? { gateway: { id: options.gatewayName } } : undefined;
-  const response = await ai.run(
-    EMBEDDING_MODEL,
-    { text },
-    aiOptions as Parameters<Ai["run"]>[2],
-  );
+  const response = await ai.run(EMBEDDING_MODEL, { text }, aiOptions as Parameters<Ai["run"]>[2]);
   const data = (response as { data: unknown }).data;
 
   if (!Array.isArray(data) || data.length === 0) {

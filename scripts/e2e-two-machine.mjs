@@ -23,9 +23,11 @@ const REPO_ROOT = resolve(__dirname, "..");
 const BIN = join(REPO_ROOT, "packages", "mcp", "dist", "index.js");
 
 const args = parseArgs(process.argv.slice(2));
-const registryUrl = args["registry-url"] ?? process.env.PATCH_REGISTRY_URL ?? "http://localhost:8787";
+const registryUrl =
+  args["registry-url"] ?? process.env.PATCH_REGISTRY_URL ?? "http://localhost:8787";
 const contributeToken = process.env.PATCH_CONTRIBUTE_TOKEN;
-const description = args.description ?? "Fetch a URL and return the body as a string. Input: 'url' (string).";
+const description =
+  args.description ?? "Fetch a URL and return the body as a string. Input: 'url' (string).";
 
 if (!process.env.ANTHROPIC_API_KEY || !process.env.E2B_API_KEY) {
   fail("ANTHROPIC_API_KEY and E2B_API_KEY must be set in env");
@@ -60,7 +62,8 @@ await writeConfig(dirB, {
 });
 
 let exitCode = 0;
-let machineA, machineB;
+let machineA;
+let machineB;
 
 try {
   // ============================================================

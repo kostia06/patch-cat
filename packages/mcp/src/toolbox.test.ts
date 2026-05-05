@@ -1,9 +1,9 @@
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { ToolNameCollisionError, ToolNotFoundError } from "@patch-cat/shared";
 import type { ToolManifest } from "@patch-cat/shared";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createToolbox } from "./toolbox.js";
 
 function makeManifest(name: string, version = "1.0.0"): ToolManifest {

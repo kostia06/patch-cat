@@ -1,8 +1,8 @@
-import {
-  type ContributeToolResponse,
-  type RegistryToolEntry,
-  type RegistryToolVersion,
-  type ToolManifest,
+import type {
+  ContributeToolResponse,
+  RegistryToolEntry,
+  RegistryToolVersion,
+  ToolManifest,
 } from "@patch-cat/shared";
 import type { Logger } from "pino";
 

@@ -1,11 +1,11 @@
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
-import type { AppVariables, Env } from "../env.js";
-import { generateRandomState, signSession } from "../jwt.js";
+import { SESSION_COOKIE, jsonError } from "../auth.js";
 import { getDb } from "../db/client.js";
 import { contributors } from "../db/schema.js";
-import { SESSION_COOKIE, jsonError } from "../auth.js";
+import type { AppVariables, Env } from "../env.js";
+import { generateRandomState, signSession } from "../jwt.js";
 
 const STATE_COOKIE = "oauth_state";
 const REDIRECT_COOKIE = "oauth_downstream";
@@ -83,7 +83,12 @@ oauthRouter.get("/auth/github/callback", async (c) => {
   });
 
   if (!tokenResp.ok) {
-    return jsonError(c, 400, "github_token_failed", `GitHub token exchange failed: ${tokenResp.status}`);
+    return jsonError(
+      c,
+      400,
+      "github_token_failed",
+      `GitHub token exchange failed: ${tokenResp.status}`,
+    );
   }
 
   const tokenJson = (await tokenResp.json()) as GithubTokenResponse;
@@ -114,7 +119,11 @@ oauthRouter.get("/auth/github/callback", async (c) => {
   }
 
   const db = getDb(c.env.DATABASE_URL);
-  let [existing] = await db.select().from(contributors).where(eq(contributors.githubId, user.id)).limit(1);
+  let [existing] = await db
+    .select()
+    .from(contributors)
+    .where(eq(contributors.githubId, user.id))
+    .limit(1);
 
   if (!existing) {
     const inserted = await db

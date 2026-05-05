@@ -10,9 +10,9 @@ import { type AnthropicMessagesClient, createGenerator } from "./generator.js";
 import type { RegistryClient } from "./registry-client.js";
 import {
   type CommandResult,
-  createSandboxRunner,
   type SandboxFactory,
   type SandboxLike,
+  createSandboxRunner,
 } from "./sandbox.js";
 import { createPatchServer } from "./server.js";
 import { createToolbox } from "./toolbox.js";
@@ -226,14 +226,8 @@ describe("registry integration: search-first generate_tool", () => {
     await server.start();
 
     const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
-    const c = new Client(
-      { name: "test-client", version: "0.0.1" },
-      { capabilities: {} },
-    );
-    await Promise.all([
-      server.mcp.connect(serverTransport),
-      c.connect(clientTransport),
-    ]);
+    const c = new Client({ name: "test-client", version: "0.0.1" }, { capabilities: {} });
+    await Promise.all([server.mcp.connect(serverTransport), c.connect(clientTransport)]);
     return c;
   }
 

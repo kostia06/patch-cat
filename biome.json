@@ -5,9 +5,6 @@
     "clientKind": "git",
     "useIgnoreFile": true
   },
-  "files": {
-    "ignore": ["dist", "node_modules", "coverage"]
-  },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
@@ -24,15 +21,32 @@
       "style": {
         "noNonNullAssertion": "warn",
         "useConst": "error",
-        "useImportType": "error"
+        "useImportType": "error",
+        "noUnusedTemplateLiteral": "off",
+        "useTemplate": "off"
       },
       "suspicious": {
-        "noExplicitAny": "error"
+        "noExplicitAny": "error",
+        "noImplicitAnyLet": "off"
       },
       "complexity": {
         "noForEach": "off"
       }
     }
+  },
+  "files": {
+    "ignore": [
+      "dist",
+      "node_modules",
+      "coverage",
+      "packages/docs/dist",
+      "packages/docs/.astro",
+      "packages/mcp/dist",
+      "scripts/seed-batch.mjs",
+      "scripts/verify-registry.mjs",
+      "scripts/demo-injection.mjs",
+      "scripts/demo-security-live.mjs"
+    ]
   },
   "javascript": {
     "formatter": {

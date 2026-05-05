@@ -1,14 +1,14 @@
-import { sql } from "drizzle-orm";
-import { Hono } from "hono";
 import {
+  type RegistryToolEntry,
   SearchToolsRequestSchema,
   VERIFIED_CONTRIBUTOR_THRESHOLD,
-  type RegistryToolEntry,
 } from "@patch-cat/shared";
-import type { AppVariables, Env } from "../env.js";
+import { sql } from "drizzle-orm";
+import { Hono } from "hono";
+import { jsonError } from "../auth.js";
 import { getDb } from "../db/client.js";
 import { embedDescription } from "../embeddings.js";
-import { jsonError } from "../auth.js";
+import type { AppVariables, Env } from "../env.js";
 
 interface SearchRow extends Record<string, unknown> {
   name: string;
@@ -99,9 +99,7 @@ searchRouter.get("/v1/tools/search", async (c) => {
     };
   });
 
-  const filtered = include_unverified
-    ? allResults
-    : allResults.filter((r) => r.verified === true);
+  const filtered = include_unverified ? allResults : allResults.filter((r) => r.verified === true);
   const results = filtered.slice(0, limit);
 
   // Edge cache for 30s — search is read-only and tolerant of staleness.
