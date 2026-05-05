@@ -2,6 +2,10 @@
 
 > Your AI assistant builds and remembers its own tools.
 
+<p align="center">
+  <img src="https://patch-cat.pages.dev/cat/sprite-sheet.png" alt="Patch — pixel-art tuxedo cat in seven poses" width="900" />
+</p>
+
 Patch is an MCP server that gives any host AI — Claude Desktop, Cursor, Claude Code, Windsurf — a permanent, growing toolbox of executable Python tools. When the host hits a capability it doesn't have, it calls `patch_generate_tool`. Patch writes a Python tool, sandbox-tests it in [e2b](https://e2b.dev), persists it to disk, and registers it as a first-class MCP tool. From that point on the host can call it natively, in this conversation and every future one.
 
 There's also a public registry: when another Patch user has already contributed a tool that fits your task, Patch pulls it instead of regenerating from scratch — no LLM call, just a fast registry lookup and an immediate sandbox run.

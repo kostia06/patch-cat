@@ -2,6 +2,10 @@
 
 > Your AI assistant builds and remembers its own tools.
 
+<p align="center">
+  <img src="./packages/docs/public/cat/sprite-sheet.png" alt="Patch — pixel-art tuxedo cat in seven poses (hunting, head tilt, sleeping, gift on doorstep, prowling, sitting on keyboard, confused)" width="900" />
+</p>
+
 This is the source-of-truth monorepo for [Patch](https://patch-cat.com), an MCP server that gives any AI host (Claude Desktop, Cursor, Claude Code, Windsurf) a permanent, growing toolbox of executable Python tools.
 
 ## Packages

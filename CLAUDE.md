@@ -180,7 +180,7 @@ If a task in a kickoff prompt seems to require any of the above, stop and ask be
 
 - **Project name:** Patch
 - **Domain:** patch-cat.com
-- **Mascot:** a black-and-white pixel-art cat (not designed yet; do not generate ASCII art for it in code)
+- **Mascot:** a pixel-art tuxedo cat — black body with a white chest blaze, dignified, slightly mischievous. Canonical 7-pose sprite set lives at `packages/docs/public/cat/` (`crouch`, `tilt`, `sleeping`, `gift`, `prowling`, `keyboard`, `confused`). The **head-tilt** pose is the brand mark / favicon (sitting upright, looking forward, head tilted ~20°). The **keyboard** pose is the landing-page hero. Do NOT generate ASCII art versions of the cat. Do NOT swap to a different cat archetype (orange, calico, etc.) — the tuxedo pattern is part of the recognizable identity.
 - **Tone:** dry, engineer-direct, slightly playful in user-facing strings only. Logs are clinical.
 - **Tagline candidates:** "Your AI assistant builds and remembers its own tools." / "The capability layer for AI assistants."
 - **Do not** anthropomorphize Patch in technical docs (no "Patch thinks", "Patch wants"). The cat persona is for marketing surfaces only.

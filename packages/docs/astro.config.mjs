@@ -10,7 +10,7 @@ export default defineConfig({
       title: "Patch",
       description: "An MCP server that lets your AI assistant build and remember its own tools.",
       logo: {
-        src: "./src/assets/cat-mark.svg",
+        src: "./src/assets/cat-mark.png",
         replacesTitle: false,
       },
       social: {
