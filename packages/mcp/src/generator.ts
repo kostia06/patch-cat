@@ -21,8 +21,8 @@ Output rules — non-negotiable:
    - \`description\`: one sentence describing what the tool does.
    - \`inputs\`: list of objects with name, type (string|number|integer|boolean|array|object), description, required (bool, default true), tainted_ok (bool, default false).
    - \`outputs\`: object with type, optional description.
-   - \`capabilities\`: { network: bool, filesystem: "none"|"read-only"|"read-write", human_confirm: bool }. Be honest — if your code uses urllib or requests, set network: true. If it reads files, set filesystem: read-only or read-write.
-   - \`runtime\`: { language: python, python_version: "3.12", packages: [pinned versions] }. Pin every package to an exact version (e.g. "requests==2.32.3"). Prefer the standard library when sufficient — leave packages empty.
+   - \`capabilities\`: { network: bool, filesystem: "none"|"read-only"|"read-write", human_confirm: bool, browser: bool }. Be honest — if your code uses urllib or requests, set network: true. If it reads files, set filesystem: read-only or read-write. Set browser: true ONLY when you need a real browser (Playwright) — JavaScript-rendered pages, interactive forms, screenshots, or login-walled flows. Static HTML scraping uses network: true with requests, NOT browser: true. browser: true requires network: true.
+   - \`runtime\`: { language: python, python_version: "3.12", packages: [pinned versions] }. Pin every package to an exact version (e.g. "requests==2.32.3"). Prefer the standard library when sufficient — leave packages empty. When capabilities.browser: true, do NOT list playwright in packages — the runtime installs it automatically.
 5. Only set \`tainted_ok: true\` for inputs whose values may legitimately come from untrusted sources (e.g. URLs to fetch, file contents to parse). Identifiers, names, or control-plane inputs should be tainted_ok: false.
 6. The script MUST not perform side effects at import time. All work happens inside \`main\`.
 
@@ -139,6 +139,66 @@ import sys
 def main(csv_text: str):
     reader = csv.DictReader(io.StringIO(csv_text))
     return list(reader)
+
+
+if __name__ == "__main__":
+    args = json.loads(sys.stdin.read())
+    print(json.dumps(main(**args)))
+
+Few-shot example #4 — render a JavaScript-heavy page and return its visible text plus a screenshot:
+
+# ---
+# name: browser_render_page
+# version: 1.0.0
+# description: Load a URL in a real headless browser and return the rendered text and a base64 PNG screenshot.
+# inputs:
+#   - name: url
+#     type: string
+#     description: HTTP(S) URL to render.
+#     tainted_ok: true
+#   - name: wait_selector
+#     type: string
+#     description: Optional CSS selector to wait for before capturing.
+#     required: false
+# outputs:
+#   type: object
+#   description: { text, screenshot_base64, title }
+# capabilities:
+#   network: true
+#   filesystem: none
+#   human_confirm: false
+#   browser: true
+# runtime:
+#   language: python
+#   python_version: "3.12"
+#   packages: []
+# ---
+
+import base64
+import json
+import sys
+
+from playwright.sync_api import sync_playwright
+
+
+def main(url: str, wait_selector: str | None = None):
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True, args=["--no-sandbox"])
+        try:
+            page = browser.new_page()
+            page.goto(url, wait_until="networkidle", timeout=30_000)
+            if wait_selector:
+                page.wait_for_selector(wait_selector, timeout=10_000)
+            text = page.inner_text("body")
+            title = page.title()
+            screenshot = page.screenshot(full_page=True)
+        finally:
+            browser.close()
+    return {
+        "title": title,
+        "text": text,
+        "screenshot_base64": base64.b64encode(screenshot).decode("ascii"),
+    }
 
 
 if __name__ == "__main__":

@@ -160,6 +160,7 @@ describe("integration", () => {
     expect(names).toEqual([
       "patch_auth_register",
       "patch_auth_status",
+      "patch_compose",
       "patch_confirm_action",
       "patch_generate_tool",
       "patch_list_runs",

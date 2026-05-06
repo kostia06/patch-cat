@@ -24,11 +24,27 @@ export const ManifestOutputSchema = z.object({
   items: z.unknown().optional(),
 });
 
-export const ManifestCapabilitiesSchema = z.object({
-  network: z.boolean().default(false),
-  filesystem: z.enum(["none", "read-only", "read-write"]).default("none"),
-  human_confirm: z.boolean().default(false),
-});
+export const ManifestCapabilitiesSchema = z
+  .object({
+    network: z.boolean().default(false),
+    filesystem: z.enum(["none", "read-only", "read-write"]).default("none"),
+    human_confirm: z.boolean().default(false),
+    /**
+     * If true, the sandbox boots Playwright + a headless Chromium so the tool
+     * can drive a real browser. Forces `network: true` — you can't browse
+     * without network egress. Adds ~15s of cold-start time per call.
+     */
+    browser: z.boolean().default(false),
+  })
+  .superRefine((cap, ctx) => {
+    if (cap.browser && !cap.network) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["browser"],
+        message: "capabilities.browser requires capabilities.network: true",
+      });
+    }
+  });
 
 export const ManifestRuntimeSchema = z.object({
   language: z.literal("python"),

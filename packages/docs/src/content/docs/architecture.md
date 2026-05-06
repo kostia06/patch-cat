@@ -13,7 +13,7 @@ Runs as a child process of your AI host (Claude Desktop, Cursor, Claude Code, Wi
 
 **Responsibilities:**
 
-- Exposes a small set of meta-tools (`patch_generate_tool`, `patch_run_tool`, `patch_list_tools`, `patch_confirm_action`, `patch_list_runs`, `patch_replay`, `patch_auth_register`, `patch_auth_status`).
+- Exposes a small set of meta-tools (`patch_generate_tool`, `patch_run_tool`, `patch_list_tools`, `patch_compose`, `patch_confirm_action`, `patch_list_runs`, `patch_replay`, `patch_auth_register`, `patch_auth_status`).
 - Dynamically registers each tool in your local toolbox as a first-class MCP tool. When a new tool is generated or pulled, it sends `notifications/tools/list_changed` so the host refreshes its tool list within ~1 second.
 - Calls Claude Opus to generate Python tools, then sandbox-tests them in e2b before saving.
 - Routes invocations through the security stack: sanitizer → quarantine → taint check → confirmation gate → sandbox.
@@ -52,6 +52,7 @@ Every Python tool runs in an [e2b](https://e2b.dev) sandbox. The sandbox is crea
 
 - `network: false` → sandbox boots with no internet access. e2b enforces at the provider layer; the manifest declaration matches the runtime constraint by construction.
 - `network: true` → default sandbox.
+- `browser: true` → Playwright + headless Chromium are installed at sandbox boot (~15s cold-start tax). Forces `network: true` — you can't browse without egress. Stays inside the e2b boundary; same trust dependency as any other tool.
 
 The sandbox receives:
 
@@ -89,6 +90,14 @@ The `na_non_deterministic` case is what most replay systems gloss over. If a too
 A `"no"` verdict for a `network: false` tool, on the other hand, is a real finding worth investigating: clock-dependent code, unseeded randomness, or a non-deterministic dependency.
 
 This is documented in detail in the [threat model](/threat-model).
+
+## Composition
+
+`patch_compose({ steps, on_error?, parallel? })` runs a multi-step workflow built from existing tools. Each step is `{ id, tool, args }`; later steps reference earlier results via `$step_id` or `$step_id.path.to.field`. Sequential mode (default) lets a step consume any earlier step's output; parallel mode runs everything concurrently with no inter-step references.
+
+The point: composition does not bypass any defense. Every step still flows through sanitizer → quarantine → taint check → confirmation gate → sandbox. If any step returns `confirmation_required` (e.g. tainted input or `human_confirm`), the whole workflow pauses and surfaces the confirmation token — the host AI must collect explicit user approval before resuming. There is no "approve all steps" shortcut by design.
+
+This makes the registry compounding: once `fetch_url`, `extract_html_text`, and `summarize_text` exist, the host AI doesn't need to generate `summarize_url`. It composes them.
 
 ## Stack lock
 

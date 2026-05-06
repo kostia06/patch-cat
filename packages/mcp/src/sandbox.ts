@@ -3,8 +3,10 @@ import { SandboxError, ToolOutputError } from "@patch-cat/shared";
 import type { ParsedTool, ToolManifest } from "@patch-cat/shared";
 
 const DEFAULT_TIMEOUT_MS = 60_000;
+const BROWSER_TIMEOUT_MS = 180_000;
 const TOOL_PATH = "/tmp/tool.py";
 const ARGS_PATH = "/tmp/args.json";
+const PLAYWRIGHT_PIN = "playwright==1.49.0";
 
 export interface CommandResult {
   stdout: string;
@@ -75,7 +77,9 @@ export interface SandboxRunner {
 export function createSandboxRunner(factory: SandboxFactory): SandboxRunner {
   return {
     async runTool(parsed, args, options = {}) {
-      const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+      const needsBrowser = parsed.manifest.capabilities.browser === true;
+      const timeoutMs =
+        options.timeoutMs ?? (needsBrowser ? BROWSER_TIMEOUT_MS : DEFAULT_TIMEOUT_MS);
       // Capability enforcement: when manifest declares network: false, the
       // sandbox is created with allowInternetAccess: false so e2b blocks egress
       // at the provider layer. This is enforced by sandbox config, not by the
@@ -90,6 +94,9 @@ export function createSandboxRunner(factory: SandboxFactory): SandboxRunner {
       try {
         await writeToolFiles(sandbox, parsed, args);
         await installPackages(sandbox, parsed.manifest, timeoutMs);
+        if (needsBrowser) {
+          await installPlaywright(sandbox, timeoutMs);
+        }
 
         const result = await sandbox.commands.run(`python ${TOOL_PATH} < ${ARGS_PATH}`, {
           timeoutMs,
@@ -185,8 +192,12 @@ async function installPackages(
   manifest: ToolManifest,
   timeoutMs: number,
 ): Promise<void> {
-  if (manifest.runtime.packages.length === 0) return;
-  const packageList = manifest.runtime.packages.map(shellQuote).join(" ");
+  const packages = [...manifest.runtime.packages];
+  if (manifest.capabilities.browser && !packages.some((p) => p.startsWith("playwright"))) {
+    packages.push(PLAYWRIGHT_PIN);
+  }
+  if (packages.length === 0) return;
+  const packageList = packages.map(shellQuote).join(" ");
   const result = await sandbox.commands.run(
     `pip install --no-input --quiet --disable-pip-version-check ${packageList}`,
     { timeoutMs },
@@ -194,6 +205,21 @@ async function installPackages(
   if (result.exitCode !== 0) {
     throw new SandboxError(
       `pip install failed with exit code ${result.exitCode}: ${result.stderr.slice(0, 500)}`,
+    );
+  }
+}
+
+async function installPlaywright(sandbox: SandboxLike, timeoutMs: number): Promise<void> {
+  // Browser binaries are NOT bundled with the pip package — they must be
+  // downloaded once per fresh sandbox via `playwright install`. Single-shot
+  // sandboxes pay this cost (~15s) every call. A custom e2b template with
+  // pre-warmed binaries removes it; tracking as a v0.5.x optimization.
+  const result = await sandbox.commands.run("python -m playwright install chromium", {
+    timeoutMs,
+  });
+  if (result.exitCode !== 0) {
+    throw new SandboxError(
+      `playwright install chromium failed (exit ${result.exitCode}): ${result.stderr.slice(0, 500)}`,
     );
   }
 }

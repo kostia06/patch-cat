@@ -15,6 +15,7 @@ import type { Logger } from "pino";
 import { type ArcadeClient, NOOP_ARCADE_CLIENT, providersFromScopes } from "./arcade.js";
 import { type AuditBlob, type AuditWriter, createAuditWriter, sha256 } from "./audit.js";
 import { startOAuthListener } from "./auth-flow.js";
+import { type ComposeRequest, type OnError, executeCompose } from "./compose.js";
 import { type PatchConfig, loadConfig, saveConfig } from "./config.js";
 import { type ConfirmationStore, createConfirmationStore, summarizeArgs } from "./confirmation.js";
 import type { Generator } from "./generator.js";
@@ -31,6 +32,7 @@ const META_AUTH_STATUS = "patch_auth_status";
 const META_CONFIRM_ACTION = "patch_confirm_action";
 const META_LIST_RUNS = "patch_list_runs";
 const META_REPLAY = "patch_replay";
+const META_COMPOSE = "patch_compose";
 
 const PULL_SIMILARITY_THRESHOLD = 0.85;
 const PULL_SUCCESS_RATE_THRESHOLD = 0.7;
@@ -161,6 +163,65 @@ const META_TOOLS: Tool[] = [
       additionalProperties: false,
     },
   },
+  {
+    name: META_COMPOSE,
+    description:
+      "Run a multi-step workflow built from existing tools. Each step references a tool by name, with args. Step args may reference earlier step results via '$step_id' or '$step_id.path.to.field' (sequential mode only). Set parallel: true to run independent steps concurrently (no inter-step references allowed). Every step still flows through the full safety pipeline (sanitizer → quarantine → taint → confirmation gate → sandbox); a confirmation_required from any step pauses the whole workflow. Use this instead of generating a new monolithic tool whenever the work decomposes into existing primitives.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        steps: {
+          type: "array",
+          description: "Ordered list of steps to execute.",
+          items: {
+            type: "object",
+            properties: {
+              id: {
+                type: "string",
+                description:
+                  "Unique step identifier. Other steps reference this via $<id>. Must be alphanumeric + underscore, leading letter.",
+              },
+              tool: {
+                type: "string",
+                description: "Tool name from the local toolbox.",
+              },
+              args: {
+                type: "object",
+                description:
+                  "Arguments for the tool. String values matching $<step_id>(.path)? are replaced with the prior step's result before invocation.",
+                additionalProperties: true,
+              },
+              on_error: {
+                type: "string",
+                enum: ["abort", "continue"],
+                description:
+                  "Per-step override for on_error. 'continue' lets later steps run even if this one fails (but they cannot reference its result).",
+              },
+              retries: {
+                type: "number",
+                description: "Max retries on error (0–3). Default 0.",
+              },
+            },
+            required: ["id", "tool"],
+            additionalProperties: false,
+          },
+        },
+        on_error: {
+          type: "string",
+          enum: ["abort", "continue"],
+          description:
+            "Default error policy for steps that don't specify their own. Default abort.",
+        },
+        parallel: {
+          type: "boolean",
+          description:
+            "If true, all steps run concurrently and inter-step $references are forbidden.",
+        },
+      },
+      required: ["steps"],
+      additionalProperties: false,
+    },
+  },
 ];
 
 export interface ServerDeps {
@@ -203,7 +264,7 @@ export function createPatchServer(deps: ServerDeps): PatchServer {
   const mcp = new Server(
     {
       name: deps.serverName ?? "patch-cat",
-      version: deps.serverVersion ?? "0.2.0",
+      version: deps.serverVersion ?? "0.4.0",
     },
     {
       capabilities: {
@@ -246,6 +307,8 @@ export function createPatchServer(deps: ServerDeps): PatchServer {
           return successJson(await handleListRuns(args));
         case META_REPLAY:
           return successJson(await handleReplay(args));
+        case META_COMPOSE:
+          return successJson(await handleCompose(args));
         default:
           return successJson(await handleDynamicCall(name, args));
       }
@@ -620,6 +683,29 @@ export function createPatchServer(deps: ServerDeps): PatchServer {
       capability_assertions: blob.capability_assertions,
       explanation: explainOutputMatch(outputMatch, blob),
     };
+  }
+
+  async function handleCompose(args: Record<string, unknown>): Promise<unknown> {
+    const stepsRaw = args.steps;
+    if (!Array.isArray(stepsRaw)) {
+      throw new PatchError("patch_compose: `steps` must be an array.");
+    }
+    const onError = args.on_error;
+    if (onError !== undefined && onError !== "abort" && onError !== "continue") {
+      throw new PatchError("patch_compose: `on_error` must be 'abort' or 'continue'.");
+    }
+    const parallel = args.parallel;
+    if (parallel !== undefined && typeof parallel !== "boolean") {
+      throw new PatchError("patch_compose: `parallel` must be a boolean.");
+    }
+    const request: ComposeRequest = {
+      steps: stepsRaw as ComposeRequest["steps"],
+      on_error: onError as OnError | undefined,
+      parallel: parallel as boolean | undefined,
+    };
+    return executeCompose(request, {
+      invokeTool: (name, stepArgs) => invokeTool(name, stepArgs),
+    });
   }
 
   async function handleConfirmAction(args: Record<string, unknown>): Promise<unknown> {
